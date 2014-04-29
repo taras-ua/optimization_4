@@ -105,7 +105,7 @@ def dual_direction(x0, eps=0.00001):
 
 # M A I N
 def main():
-    x0 = np.array([1.0, 2.0])
+    x0 = np.array([.0, .0])
     dual_direction(x0)
 
 
