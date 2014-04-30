@@ -4,12 +4,12 @@ import math
 
 # Target matrix
 def matrix_a():
-    return np.matrix("4.0 0.01; 0.01 16.0")
+    return np.matrix("2.0 2.0; 2.0 2000.0")
 
 
 # Target vector
 def vector_b():
-    return np.array([1, -1])
+    return np.array([2, 5996])
 
 
 # Vector scalar
@@ -44,29 +44,21 @@ def grad(x):
     return np.array([derivative(0, x), derivative(1, x)])
 
 
-# Step grinding method
-def step_grind(target_func, x):
-    alpha = 1.0
-    while target_func(x) < target_func(x - alpha * grad(x)):
-        alpha /= 2.0
-    return alpha
-
-
 # Step golden grind
-def golden(func, x, h, eps=0.00001):
-    a = 0.0
-    b = 100.0
-    gold = (1 + math.sqrt(5)) / 2
-    while b-a > eps:
-        x1 = b - (b - a) / gold
-        x2 = a + (b - a) / gold
-        y1 = func(x + x1 * h)
-        y2 = func(x + x2 * h)
+def golden(fun, t, p, eps=0.00001):
+    right = 2
+    left = -2
+    golden_section = (1 + 5 ** 0.5) / 2
+    while abs(right - left) > eps:
+        x1, x2 = right - (right - left) / golden_section, left + (right - left) / golden_section
+        arg1 = t + x1 * p
+        arg2 = t + x2 * p
+        y1, y2 = fun(arg1), fun(arg2)
         if y1 >= y2:
-            a = x1
-        if y1 < y2:
-            b = x2
-    return (b - a) / 2
+            left = x1
+        else:
+            right = x2
+    return (x1 + x2) / 2
 
 
 # Beta parameter from method
@@ -92,8 +84,8 @@ def dual_direction(x0, eps=0.00001):
         print "h = ", h
         print "||grad|| = ", np.linalg.norm(grad(x))
         iteration += 1
-        x += step_grind(f, x) * h
-        h = direction(matrix_a(), x0, h)
+        x += golden(f, x, h) * h
+        h = direction(matrix_a(), x, h)
         if np.linalg.norm(grad(x)) < eps:
             break
     print ""
@@ -105,7 +97,7 @@ def dual_direction(x0, eps=0.00001):
 
 # M A I N
 def main():
-    x0 = np.array([.0, .0])
+    x0 = np.array([1.0, 1.0])
     dual_direction(x0)
 
 
